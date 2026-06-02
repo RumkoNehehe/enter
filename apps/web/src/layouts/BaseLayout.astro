@@ -1,0 +1,37 @@
+---
+type Props = {
+  title: string;
+  description?: string;
+};
+
+const {
+  title,
+  description = "Technický prototyp Astro + Sanity magazínu."
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="sk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+  </head>
+
+  <body>
+    <header>
+      <a href="/">Magazín POC</a>
+
+      <nav>
+        <a href="/">Domov</a>
+      </nav>
+    </header>
+
+    <slot />
+
+    <footer>
+      <p>© 2026 Magazín POC</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+---
+type Props = {
+  title: string;
+  slug: string;
+  excerpt: string;
+  category: string;
+};
+
+const { title, slug, excerpt, category } = Astro.props;
+---
+
+<article>
+  <p>{category}</p>
+
+  <h2>
+    <a href={`/articles/${slug}`}>
+      {title}
+    </a>
+  </h2>
+
+  <p>{excerpt}</p>
+</article>
