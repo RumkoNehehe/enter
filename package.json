@@ -1,0 +1,12 @@
+{
+  "name": "enter",
+  "version": "1.0.0",
+  "type": "module",
+    "private":"true",
+    "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "dev:studio": "pnpm --filter studio dev",
+    "build:web": "pnpm --filter web build",
+    "build:studio": "pnpm --filter studio build"
+  }
+}

@@ -1,0 +1,16 @@
+node_modules
+.pnpm-store
+
+dist
+.output
+.vercel
+.netlify
+
+.env
+.env.*
+!.env.example
+
+.DS_Store
+Thumbs.db
+
+.sanity
