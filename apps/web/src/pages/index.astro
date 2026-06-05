@@ -1,21 +1,16 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import ArticleCard from "../components/ArticleCard.astro";
+import type { Article } from "../types/Article";
+import { sanityClient } from "../lib/sanity";
 
-const articles = [
-  {
-    title: "Prvý testovací článok",
-    slug: "prvy-testovaci-clanok",
-    excerpt: "Toto je iba lokálny článok, neskôr pôjde zo Sanity.",
-    category: "Kultúra"
-  },
-  {
-    title: "Druhý článok",
-    slug: "druhy-clanok",
-    excerpt: "Overujeme si Astro routing a komponenty.",
-    category: "Technológie"
+const articles = await sanityClient.fetch<Article[]>(`
+  *[_type == "article" && defined(slug.current)] | order(publishedAt desc) {
+    title,
+    "slug": slug.current,
+    excerpt,
+    publishedAt
   }
-];
+`);
 ---
 
 <BaseLayout title="Magazín POC">
@@ -24,14 +19,30 @@ const articles = [
     <p>Technický prototyp Astro + Sanity magazínu.</p>
 
     <section>
-      {articles.map((article) => (
-        <ArticleCard
-          title={article.title}
-          slug={article.slug}
-          excerpt={article.excerpt}
-          category={article.category}
-        />
-      ))}
+      <h2>Články</h2>
+
+      {
+        articles.length === 0 ? (
+          <p>Zatiaľ tu nie sú žiadne články.</p>
+        ) : (
+          articles.map((article: Article) => (
+            <article>
+              <h3>
+                <a href={`/articles/${article.slug}`}>
+                  {article.title}
+                </a>
+              </h3>
+
+              {article.excerpt && <p>{article.excerpt}</p>}
+              {article.publishedAt && (
+                <time datetime={article.publishedAt}>
+                  {new Date(article.publishedAt).toLocaleDateString("sk-SK")}
+                </time>
+              )}
+            </article>
+          ))
+        )
+      }
     </section>
   </main>
 </BaseLayout>

@@ -14,3 +14,6 @@ minimumReleaseAgeExclude:
   - '@sanity/util@5.29.0'
   - '@sanity/vision@5.29.0'
   - sanity@5.29.0
+  - react-dom@19.2.7
+  - react-is@19.2.7
+  - react@19.2.7
