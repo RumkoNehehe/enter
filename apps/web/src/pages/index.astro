@@ -1,48 +1,28 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import type { Article } from "../types/Article";
-import { sanityClient } from "../lib/sanity";
+import ArticleCard from "../components/ArticleCard.astro";
+import { getArticles } from "../lib/queries/articles";
 
-const articles = await sanityClient.fetch<Article[]>(`
-  *[_type == "article" && defined(slug.current)] | order(publishedAt desc) {
-    title,
-    "slug": slug.current,
-    excerpt,
-    publishedAt
-  }
-`);
+const articles = await getArticles();
 ---
 
 <BaseLayout title="Magazín POC">
-  <main>
-    <h1>Magazín POC</h1>
-    <p>Technický prototyp Astro + Sanity magazínu.</p>
+  <h1>Magazín POC</h1>
 
-    <section>
-      <h2>Články</h2>
+  <p>Technický prototyp Astro + Sanity magazínu.</p>
 
-      {
-        articles.length === 0 ? (
-          <p>Zatiaľ tu nie sú žiadne články.</p>
-        ) : (
-          articles.map((article: Article) => (
-            <article>
-              <h3>
-                <a href={`/articles/${article.slug}`}>
-                  {article.title}
-                </a>
-              </h3>
+  <h2>Články</h2>
 
-              {article.excerpt && <p>{article.excerpt}</p>}
-              {article.publishedAt && (
-                <time datetime={article.publishedAt}>
-                  {new Date(article.publishedAt).toLocaleDateString("sk-SK")}
-                </time>
-              )}
-            </article>
-          ))
-        )
-      }
-    </section>
-  </main>
+  {articles.length === 0 ? (
+    <p>Zatiaľ nebol publikovaný žiadny článok.</p>
+  ) : (
+    articles.map((article) => (
+      <ArticleCard
+        title={article.title}
+        slug={article.slug}
+        excerpt={article.excerpt}
+        publishedAt={article.publishedAt}
+      />
+    ))
+  )}
 </BaseLayout>

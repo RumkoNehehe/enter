@@ -1,19 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { PortableText } from "astro-portabletext";
-import { sanityClient } from "../../lib/sanity";
+import { getArticles } from "../../lib/queries/articles";
 import type { Article } from "../../types/Article";
 
 export async function getStaticPaths() {
-  const articles = await sanityClient.fetch<Article[]>(`
-    *[_type == "article" && defined(slug.current)] {
-      title,
-      "slug": slug.current,
-      excerpt,
-      publishedAt,
-      body
-    }
-  `);
+  const articles = await getArticles();
 
   return articles.map((article: Article) => ({
     params: {
@@ -28,22 +20,18 @@ export async function getStaticPaths() {
 const { article } = Astro.props;
 ---
 
-<BaseLayout title={article.title} description={article.excerpt}>
-  <main>
-    <a href="/">← Späť na homepage</a>
+<BaseLayout title={article.title}>
+  <a href="/">← Späť na homepage</a>
 
-    <article>
-      <h1>{article.title}</h1>
+  <article>
+    <h1>{article.title}</h1>
 
-      {article.publishedAt && (
-        <time datetime={article.publishedAt}>
-          {new Date(article.publishedAt).toLocaleDateString("sk-SK")}
-        </time>
-      )}
+    {article.publishedAt && (
+      <p>{new Date(article.publishedAt).toLocaleDateString("sk-SK")}</p>
+    )}
 
-      {article.excerpt && <p>{article.excerpt}</p>}
+    {article.excerpt && <p>{article.excerpt}</p>}
 
-      {article.body && <PortableText value={article.body} />}
-    </article>
-  </main>
+    {article.body && <PortableText value={article.body} />}
+  </article>
 </BaseLayout>
