@@ -1,24 +1,65 @@
 ---
+import { urlFor } from "../lib/image";
+import type { Article } from "../types/Article";
+
 type Props = {
-  title: string;
-  slug: string;
-  excerpt?: string;
-  publishedAt?: string;
+    article: Article;
 };
 
-const { title, slug, excerpt, publishedAt } = Astro.props;
+const { article } = Astro.props;
+
+const imageUrl = article.mainImage
+    ? urlFor(article.mainImage).width(800).height(450).url()
+    : null;
 ---
 
 <article>
-  <h2>
-    <a href={`/articles/${slug}/`}>{title}</a>
-  </h2>
+    {
+        imageUrl && (
+            <a href={`/articles/${article.slug}/`}>
+                <img
+                    src={imageUrl}
+                    alt={article.mainImage?.alt ?? article.title}
+                    width="800"
+                    height="450"
+                    loading="lazy"
+                />
+            </a>
+        )
+    }
 
-  {excerpt && <p>{excerpt}</p>}
+    {
+        article.category && (
+            <p>
+                <a href={`/categories/${article.category.slug}/`}>
+                    {article.category.title}
+                </a>
+            </p>
+        )
+    }
 
-  {publishedAt && (
-    <time datetime={publishedAt}>
-      {new Date(publishedAt).toLocaleDateString("sk-SK")}
-    </time>
-  )}
+    <h2>
+        <a href={`/articles/${article.slug}/`}>{article.title}</a>
+    </h2>
+
+    {article.excerpt && <p>{article.excerpt}</p>}
+
+    {
+        article.author && (
+            <p>
+                Autor:{" "}
+                <a href={`/authors/${article.author.slug}/`}>
+                    {article.author.name}
+                </a>
+            </p>
+        )
+    }
+
+    {
+        article.publishedAt && (
+            <time datetime={article.publishedAt}>
+                {new Date(article.publishedAt).toLocaleDateString("sk-SK")}
+            </time>
+        )
+    }
 </article>

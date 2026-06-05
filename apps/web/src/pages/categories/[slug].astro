@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import {
+  getArticlesByCategorySlug,
+  getCategoryBySlug,
+  getCategorySlugs,
+} from "../../lib/queries/categories";
+
+export async function getStaticPaths() {
+  const categories = await getCategorySlugs();
+
+  return categories.map((category) => ({
+    params: {
+      slug: category.slug,
+    },
+  }));
+}
+
+const { slug } = Astro.params;
+
+const category = slug ? await getCategoryBySlug(slug) : null;
+
+if (!category) {
+  return Astro.redirect("/404");
+}
+
+const articles = await getArticlesByCategorySlug(category.slug);
+---
+
+<BaseLayout title={category.title}>
+  <a href="/">← Späť na homepage</a>
+
+  <h1>{category.title}</h1>
+
+  {category.description && <p>{category.description}</p>}
+
+  <h2>Články v kategórii</h2>
+
+  {articles.length === 0 ? (
+    <p>V tejto kategórii zatiaľ nie sú žiadne články.</p>
+  ) : (
+    articles.map((article) => <ArticleCard article={article} />)
+  )}
+</BaseLayout>

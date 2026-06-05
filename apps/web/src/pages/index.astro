@@ -16,13 +16,6 @@ const articles = await getArticles();
   {articles.length === 0 ? (
     <p>Zatiaľ nebol publikovaný žiadny článok.</p>
   ) : (
-    articles.map((article) => (
-      <ArticleCard
-        title={article.title}
-        slug={article.slug}
-        excerpt={article.excerpt}
-        publishedAt={article.publishedAt}
-      />
-    ))
+    articles.map((article) => <ArticleCard article={article} />)
   )}
 </BaseLayout>

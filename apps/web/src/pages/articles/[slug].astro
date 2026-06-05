@@ -1,37 +1,79 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { PortableText } from "astro-portabletext";
-import { getArticles } from "../../lib/queries/articles";
-import type { Article } from "../../types/Article";
+import { getArticleBySlug, getArticleSlugs } from "../../lib/queries/articles";
+import { urlFor } from "../../lib/image";
 
 export async function getStaticPaths() {
-  const articles = await getArticles();
+    const articles = await getArticleSlugs();
 
-  return articles.map((article: Article) => ({
-    params: {
-      slug: article.slug,
-    },
-    props: {
-      article,
-    },
-  }));
+    return articles.map((article) => ({
+        params: {
+            slug: article.slug,
+        },
+    }));
 }
 
-const { article } = Astro.props;
+const { slug } = Astro.params;
+const article = slug ? await getArticleBySlug(slug) : null;
+
+if (!article) {
+    return Astro.redirect("/404");
+}
+
+const imageUrl = article.mainImage
+    ? urlFor(article.mainImage).width(1200).height(675).url()
+    : null;
 ---
 
 <BaseLayout title={article.title}>
-  <a href="/">← Späť na homepage</a>
+    <a href="/">← Späť na homepage</a>
 
-  <article>
-    <h1>{article.title}</h1>
+    <article>
+        {
+            article.category && (
+                <p>
+                    <a href={`/categories/${article.category.slug}/`}>
+                        {article.category.title}
+                    </a>
+                </p>
+            )
+        }
 
-    {article.publishedAt && (
-      <p>{new Date(article.publishedAt).toLocaleDateString("sk-SK")}</p>
-    )}
+        <h1>{article.title}</h1>
 
-    {article.excerpt && <p>{article.excerpt}</p>}
+        {article.excerpt && <p>{article.excerpt}</p>}
 
-    {article.body && <PortableText value={article.body} />}
-  </article>
+        {
+            imageUrl && (
+                <img
+                    src={imageUrl}
+                    alt={article.mainImage?.alt ?? article.title}
+                    width="1200"
+                    height="675"
+                />
+            )
+        }
+
+        {
+            article.author?.slug && (
+                <p>
+                    Autor:{" "}
+                    <a href={`/authors/${article.author.slug}/`}>
+                        {article.author.name}
+                    </a>
+                </p>
+            )
+        }
+
+        {
+            article.publishedAt && (
+                <time datetime={article.publishedAt}>
+                    {new Date(article.publishedAt).toLocaleDateString("sk-SK")}
+                </time>
+            )
+        }
+
+        {article.body && <PortableText value={article.body} />}
+    </article>
 </BaseLayout>

@@ -50,6 +50,9 @@ importers:
       '@sanity/client':
         specifier: ^7.22.1
         version: 7.22.1
+      '@sanity/image-url':
+        specifier: ^2.1.1
+        version: 2.1.1
       astro:
         specifier: ^6.4.3
         version: 6.4.3(jiti@2.7.0)(rollup@4.61.0)(tsx@4.22.4)(yaml@2.9.0)

@@ -1,28 +1,12 @@
 import { sanityClient } from "../sanity";
 import type { Article } from "../../types/Article";
-
-const articleListFields = `
-  _id,
-  title,
-  "slug": slug.current,
-  excerpt,
-  publishedAt
-`;
-
-const articleDetailFields = `
-  _id,
-  title,
-  "slug": slug.current,
-  excerpt,
-  publishedAt,
-  body
-`;
+import { articleCardFields, articleDetailFields} from "./fragments";
 
 export async function getArticles() {
   return sanityClient.fetch<Article[]>(`
-    *[_type == "article" && defined(slug.current)] 
+    *[_type == "article" && defined(slug.current)]
     | order(publishedAt desc) {
-      ${articleListFields}
+      ${articleCardFields}
     }
   `);
 }

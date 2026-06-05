@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import { urlFor } from "../../lib/image";
+import {
+  getArticlesByAuthorSlug,
+  getAuthorBySlug,
+  getAuthorSlugs,
+} from "../../lib/queries/authors";
+
+export async function getStaticPaths() {
+  const authors = await getAuthorSlugs();
+
+  return authors.map((author) => ({
+    params: {
+      slug: author.slug,
+    },
+  }));
+}
+
+const { slug } = Astro.params;
+
+const author = slug ? await getAuthorBySlug(slug) : null;
+
+if (!author) {
+  return Astro.redirect("/404");
+}
+
+const articles = await getArticlesByAuthorSlug(author.slug);
+
+const imageUrl = author.image
+  ? urlFor(author.image).width(300).height(300).url()
+  : null;
+---
+
+<BaseLayout title={author.name}>
+  <a href="/">← Späť na homepage</a>
+
+  <section>
+    {imageUrl && (
+      <img
+        src={imageUrl}
+        alt={author.image?.alt ?? author.name}
+        width="300"
+        height="300"
+      />
+    )}
+
+    <h1>{author.name}</h1>
+
+    {author.bio && <p>{author.bio}</p>}
+  </section>
+
+  <h2>Články autora</h2>
+
+  {articles.length === 0 ? (
+    <p>Tento autor zatiaľ nemá publikované žiadne články.</p>
+  ) : (
+    articles.map((article) => <ArticleCard article={article} />)
+  )}
+</BaseLayout>
